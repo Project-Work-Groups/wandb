@@ -12,7 +12,7 @@ from wandb.sdk.lib.paths import FilePathStr, StrPath, URIStr
 if TYPE_CHECKING:
     import requests
 
-    from wandb.sdk.artifacts.artifact import Artifact as ArtifactInterface
+    from wandb.sdk.artifacts.artifact import Artifact
 
 
 class HTTPHandler(StorageHandler):
@@ -63,7 +63,7 @@ class HTTPHandler(StorageHandler):
 
     def store_path(
         self,
-        artifact: "ArtifactInterface",
+        artifact: "Artifact",
         path: Union[URIStr, FilePathStr],
         name: Optional[StrPath] = None,
         checksum: bool = True,

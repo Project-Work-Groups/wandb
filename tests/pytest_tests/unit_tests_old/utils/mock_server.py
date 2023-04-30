@@ -117,7 +117,7 @@ def mock_server(mocker):
     # From previous wandb_gql transport library.
     mocker.patch("wandb_gql.transport.requests.requests", mock)
 
-    mocker.patch("wandb.sdk.artifacts.public_artifact.requests", mock)
+    mocker.patch("wandb.sdk.artifacts.artifact.requests", mock)
     mocker.patch(
         "wandb.sdk.artifacts.storage_policies.wandb_storage_policy.requests", mock
     )

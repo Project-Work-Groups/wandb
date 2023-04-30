@@ -80,8 +80,7 @@ class ArtifactManifestEntryPatch(ArtifactManifestEntry):
 
 
 def make_local_artifact_public(art):
-    pub = Artifact(
-        None,
+    pub = Artifact.from_attrs(
         "FAKE_ENTITY",
         "FAKE_PROJECT",
         "FAKE_NAME",
@@ -100,6 +99,7 @@ def make_local_artifact_public(art):
                 "name": "FAKE_TYPE_NAME",
             },
         },
+        None,
     )
     pub._manifest = art._manifest
     return pub

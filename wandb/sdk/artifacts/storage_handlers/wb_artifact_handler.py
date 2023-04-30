@@ -3,11 +3,11 @@ import os
 from typing import TYPE_CHECKING, Optional, Sequence, Union
 from urllib.parse import urlparse
 
+import wandb
 from wandb import util
 from wandb.apis import PublicApi
 from wandb.sdk.artifacts.artifact_manifest_entry import ArtifactManifestEntry
 from wandb.sdk.artifacts.artifacts_cache import get_artifacts_cache
-from wandb.sdk.artifacts.public_artifact import Artifact as PublicArtifact
 from wandb.sdk.artifacts.storage_handler import StorageHandler
 from wandb.sdk.lib.hashutil import b64_to_hex_id, hex_to_b64_id
 from wandb.sdk.lib.paths import FilePathStr, StrPath, URIStr
@@ -15,7 +15,7 @@ from wandb.sdk.lib.paths import FilePathStr, StrPath, URIStr
 if TYPE_CHECKING:
     from urllib.parse import ParseResult
 
-    from wandb.sdk.artifacts.artifact import Artifact as ArtifactInterface
+    from wandb.sdk.artifacts.artifact import Artifact
 
 
 class WBArtifactHandler(StorageHandler):
@@ -62,7 +62,7 @@ class WBArtifactHandler(StorageHandler):
         artifact_id = util.host_from_path(manifest_entry.ref)
         artifact_file_path = util.uri_from_path(manifest_entry.ref)
 
-        dep_artifact = PublicArtifact.from_id(hex_to_b64_id(artifact_id), self.client)
+        dep_artifact = wandb.Artifact.from_id(hex_to_b64_id(artifact_id), self.client)
         link_target_path: FilePathStr
         if local:
             link_target_path = dep_artifact.get_path(artifact_file_path).download()
@@ -73,7 +73,7 @@ class WBArtifactHandler(StorageHandler):
 
     def store_path(
         self,
-        artifact: "ArtifactInterface",
+        artifact: "Artifact",
         path: Union[URIStr, FilePathStr],
         name: Optional[StrPath] = None,
         checksum: bool = True,
@@ -96,7 +96,7 @@ class WBArtifactHandler(StorageHandler):
         while path is not None and urlparse(path).scheme == self._scheme:
             artifact_id = util.host_from_path(path)
             artifact_file_path = util.uri_from_path(path)
-            target_artifact = PublicArtifact.from_id(
+            target_artifact = wandb.Artifact.from_id(
                 hex_to_b64_id(artifact_id), self.client
             )
 

@@ -22,7 +22,6 @@ from wandb.sdk.artifacts.artifact import Artifact as ArtifactInterface
 from wandb.sdk.artifacts.artifact_download_logger import ArtifactDownloadLogger
 from wandb.sdk.artifacts.artifact_manifest import ArtifactManifest
 from wandb.sdk.artifacts.artifacts_cache import get_artifacts_cache
-from wandb.sdk.artifacts.downloaded_artifact_entry import DownloadedArtifactEntry
 from wandb.sdk.lib.hashutil import hex_to_b64_id, md5_file_b64
 from wandb.sdk.lib.paths import LogicalPath
 
@@ -297,7 +296,7 @@ class Artifact(ArtifactInterface):
         self._metadata = metadata
 
     @property
-    def manifest(self):
+    def manifest(self) -> ArtifactManifest:
         return self._load_manifest()
 
     @property
@@ -552,8 +551,8 @@ class Artifact(ArtifactInterface):
         entry = manifest.entries.get(name) or self._get_obj_entry(name)[0]
         if entry is None:
             raise KeyError("Path not contained in artifact: %s" % name)
-
-        return DownloadedArtifactEntry(entry, self)
+        entry._parent_artifact = self
+        return entry
 
     def get(self, name):
         entry, wb_class = self._get_obj_entry(name)

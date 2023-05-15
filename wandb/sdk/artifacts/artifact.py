@@ -1,5 +1,6 @@
 """Artifact interface."""
-from typing import IO, TYPE_CHECKING, ContextManager, List, Optional, Sequence, Union
+import contextlib
+from typing import IO, TYPE_CHECKING, Generator, List, Optional, Sequence, Union
 
 import wandb
 from wandb.data_types import WBValue
@@ -189,13 +190,14 @@ class Artifact:
         """Get a list of the runs that have used this artifact."""
         raise NotImplementedError
 
-    def logged_by(self) -> "wandb.apis.public.Run":
+    def logged_by(self) -> Optional["wandb.apis.public.Run"]:
         """Get the run that first logged this artifact."""
         raise NotImplementedError
 
+    @contextlib.contextmanager
     def new_file(
         self, name: str, mode: str = "w", encoding: Optional[str] = None
-    ) -> ContextManager[IO]:
+    ) -> Generator[IO, None, None]:
         """Open a new temporary file that will be automatically added to the artifact.
 
         Arguments:
@@ -289,7 +291,7 @@ class Artifact:
     def add_reference(
         self,
         uri: Union["ArtifactManifestEntry", str],
-        name: Optional[str] = None,
+        name: Optional[StrPath] = None,
         checksum: bool = True,
         max_objects: Optional[int] = None,
     ) -> Sequence["ArtifactManifestEntry"]:
@@ -358,7 +360,7 @@ class Artifact:
         """
         raise NotImplementedError
 
-    def add(self, obj: WBValue, name: str) -> "ArtifactManifestEntry":
+    def add(self, obj: WBValue, name: StrPath) -> "ArtifactManifestEntry":
         """Add wandb.WBValue `obj` to the artifact.
 
         ```
@@ -424,7 +426,7 @@ class Artifact:
         """
         raise NotImplementedError
 
-    def get(self, name: str) -> WBValue:
+    def get(self, name: str) -> Optional[WBValue]:
         """Get the WBValue object located at the artifact relative `name`.
 
         Arguments:
@@ -484,7 +486,7 @@ class Artifact:
         """
         raise NotImplementedError
 
-    def verify(self, root: Optional[str] = None) -> bool:
+    def verify(self, root: Optional[str] = None) -> None:
         """Verify that the actual contents of an artifact match the manifest.
 
         All files in the directory are checksummed and the checksums are then
@@ -523,7 +525,7 @@ class Artifact:
         """
         raise NotImplementedError
 
-    def delete(self) -> None:
+    def delete(self, delete_aliases: bool = False) -> None:
         """Delete this artifact, cleaning up all files associated with it.
 
         NOTE: Deletion is permanent and CANNOT be undone.
